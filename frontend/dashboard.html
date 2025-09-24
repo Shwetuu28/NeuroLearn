@@ -14,96 +14,47 @@
       --bg: #f6f8fb;
       --card-bg: #ffffff;
     }
-    body {
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      background: var(--bg);
-      color:#0f172a;
-      display:flex;
-      flex-direction:column;
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
-    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg),#eef2ff 120px);color:#0f172a;display:flex;flex-direction:column;min-height:100vh;-webkit-font-smoothing:antialiased}
 
-    /* HEADER */
-    header.global-header {
-      background: #2563eb;
-      border-bottom: 4px solid var(--brand);
-      box-shadow: 0 2px 8px rgba(10,20,40,0.04);
-      position: sticky;
-      top: 0;
-      z-index: 60;
-    }
-    .header-inner {
-      max-width:1200px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display:flex;
-      align-items:center;
-      gap:16px;
-      justify-content:space-between;
-    }
-    .brand {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      text-decoration:none;
-    }
-    .brand div {
-      font-size:19px;
-      font-weight:700;
-      color:white;
-    }
-    .nav { display:flex; gap:20px; align-items:center; }
-    .nav a {
-      text-decoration:none;
-      color:#ebedf1;
-      font-weight:600;
-      padding:8px 6px;
-      border-radius:6px;
-    }
-    .nav a:hover {
-      background: rgba(99,102,241,0.06);
-      color:#fff;
-    }
+    header.global-header{background:var(--accent);border-bottom:4px solid var(--brand);box-shadow:0 2px 12px rgba(10,20,40,0.06);position:sticky;top:0;z-index:60}
+    .header-inner{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:16px;justify-content:space-between}
+    .brand{display:flex;gap:12px;align-items:center;text-decoration:none}
+    .brand .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+    .brand div{font-size:18px;font-weight:800;color:white}
 
-    /* CONTAINER */
-    .container { max-width:1100px; margin:20px auto; flex:1; display:flex; flex-direction:column; gap:18px; padding:0 16px; }
+    .nav{display:flex;gap:12px;align-items:center}
+    .nav a{text-decoration:none;color:#eef2ff;font-weight:700;padding:8px 10px;border-radius:8px}
+    .nav a:hover{background:rgba(255,255,255,0.06)}
 
-    /* Top cards */
+    .container{max-width:1100px;margin:22px auto;flex:1;display:flex;flex-direction:column;gap:18px;padding:0 16px}
+    .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .greeting{display:flex;flex-direction:column}
+    .greeting h2{margin:0;font-size:20px}
+    .greeting p{margin:4px 0 0 0;color:var(--muted)}
+
     .cards{display:flex;gap:12px;flex-wrap:wrap}
-    .card{
-      background:var(--card-bg);
-      border-radius:12px;
-      padding:16px;
-      flex:1 1 220px;
-      box-shadow:0 8px 24px rgba(12,18,40,0.06);
-      display:flex;flex-direction:column;gap:8px;
-    }
+    .card{background:var(--card-bg);border-radius:12px;padding:16px;flex:1 1 240px;box-shadow:0 8px 24px rgba(12,18,40,0.06);display:flex;flex-direction:column;gap:8px;min-width:180px}
     .card .value{font-size:22px;font-weight:800}
     .card .label{color:var(--muted);font-size:13px}
     .small-note{font-size:13px;color:var(--muted)}
 
-    /* main layout */
     .main-grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
-    @media (max-width:980px){ .main-grid{grid-template-columns:1fr} }
+    @media (max-width:980px){.main-grid{grid-template-columns:1fr}}
 
-    /* left pane: chart + summaries */
-    .pane{background:var(--card-bg);border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(12,18,40,0.06)}
+    .pane{background:var(--card-bg);border-radius:12px;padding:16px;box-shadow:0 8px 24px rgba(12,18,40,0.06)}
     .pane h3{margin:0 0 8px 0}
-    #focusChart{width:100%;height:200px;display:block}
+    #focusChart{width:100%;height:260px;display:block}
 
     .summaries{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-    .summary-card{background:#fafbff;border-radius:10px;padding:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-    .summary-content{flex:1}
+    .summary-card{background:linear-gradient(180deg,#fbfbff,#fff);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border:1px solid rgba(99,102,241,0.06)}
     .summary-title{font-weight:700}
-    .summary-snippet{color:var(--muted);font-size:14px;margin-top:4px}
+    .summary-snippet{color:var(--muted);font-size:14px;margin-top:6px}
     .summary-actions{display:flex;gap:8px;align-items:center}
     .btn{padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
     .btn.primary{background:var(--brand);color:#fff}
     .btn.ghost{background:#fff;border:1px solid #e6e9f5;color:var(--brand)}
 
-    /* right pane: profile controls */
     .panel{display:flex;flex-direction:column;gap:12px}
     .control{background:#fff;border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(12,18,40,0.04)}
     label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
@@ -111,116 +62,284 @@
     .range-row input[type=range]{flex:1}
     .select{width:100%;padding:8px;border-radius:8px;border:1px solid #e6e9f5}
 
-    /* FOOTER */
-    footer.global-footer {
-      background: var(--brand);
-      color: #fff;
-      padding:18px 16px;
-      text-align:center;
-      margin-top:auto;
-    }
-    .footer-inner {
-      max-width:1200px;
-      margin:0 auto;
-      font-size:14px;
-      font-weight:700;
-    }
+    .muted{color:var(--muted);font-size:13px}
+    .empty{color:var(--muted);padding:18px;text-align:center;border-radius:10px;background:#fff}
 
-    /* toast */
-    .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.15);opacity:0;transform:translateY(8px);transition:all .3s}
+    footer.global-footer{background:var(--brand);color:#fff;padding:18px 16px;text-align:center;margin-top:auto}
+    .footer-inner{max-width:1200px;margin:0 auto;font-size:14px;font-weight:700}
+
+    .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.15);opacity:0;transform:translateY(8px);transition:all .28s}
     .toast.show{opacity:1;transform:translateY(0)}
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="global-header">
     <div class="header-inner">
       <a class="brand" href="#">
-        <div>📊 Personal Dashboard</div>
+        <div class="logo">NL</div>
+        <div>Personal Dashboard</div>
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>
-        <a href="#about">About</a>
-        <a href="#features">Features</a>
-        <a href="#contact">Contact</a>
+        <a href="index.html#about">About</a>
+        <a  href="ai.html">AI Tutor</a>
+        <a href="dashboard.html">Dashboard</a>
       </nav>
     </div>
   </header>
 
-  <!-- CONTENT -->
   <div class="container">
-    <!-- Top summary cards -->
+    <div class="top-row">
+      <div class="greeting">
+        <h2>Good to see you, Student 👋</h2>
+        <p class="muted">Here's a quick view of your recent focus & saved summaries</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="refreshBtn" class="btn ghost">Refresh</button>
+        <button id="newSummary" class="btn primary">New Summary</button>
+      </div>
+    </div>
+
     <section class="cards">
-      <div class="card">
-        <div class="label">Focus Today</div>
-        <div class="value" id="focusToday">—</div>
-        <div class="small-note">Minutes focused today</div>
-      </div>
-      <div class="card">
-        <div class="label">Sessions (last 7 days)</div>
-        <div class="value" id="sessionsCount">—</div>
-        <div class="small-note">Number of study sessions</div>
-      </div>
-      <div class="card">
-        <div class="label">Saved Notes</div>
-        <div class="value" id="savedNotesCount">—</div>
-        <div class="small-note">Summaries & flashcards saved</div>
-      </div>
+      <div class="card"><div class="label">Focus Today</div><div class="value" id="focusToday">0 <span class="muted" style="font-weight:600;font-size:13px">min</span></div><div class="small-note">Minutes focused today</div></div>
+      <div class="card"><div class="label">Sessions (last 7 days)</div><div class="value" id="sessionsCount">0</div><div class="small-note">Number of study sessions</div></div>
+      <div class="card"><div class="label">Saved Notes</div><div class="value" id="savedNotesCount">0</div><div class="small-note">Summaries & flashcards saved</div></div>
     </section>
 
     <div class="main-grid">
-      <!-- left: chart + recent summaries -->
       <div style="display:flex;flex-direction:column;gap:12px">
         <div class="pane">
-          <h3>Focus Stamina (last 3 sessions)</h3>
+          <h3>Focus Stamina</h3>
+          <p class="muted" style="margin:6px 0 12px 0">A quick glance at your last sessions</p>
           <canvas id="focusChart"></canvas>
+          <div style="display:flex;justify-content:space-between;margin-top:12px;align-items:center">
+            <div class="muted">Average: <strong id="avgFocus">0</strong> min</div>
+            <div class="muted">Best: <strong id="bestFocus">0</strong> min</div>
+          </div>
         </div>
         <div class="pane">
           <h3>Recent Saved Summaries</h3>
-          <div class="summaries" id="summariesList"></div>
+          <div id="summariesList" class="summaries"></div>
+          <div id="emptySummaries" class="empty" style="display:none">No summaries yet — create your first one.</div>
         </div>
       </div>
 
-      <!-- right: profile controls -->
       <aside class="panel">
         <div class="control">
           <label for="attentionRange">Attention span: <span id="attentionLabel">Medium</span></label>
-          <div class="range-row">
-            <input id="attentionRange" type="range" min="1" max="3" step="1" value="2">
-            <div style="width:40px;text-align:center;font-weight:700" id="attentionValue">2</div>
+          <div class="range-row"><input id="attentionRange" type="range" min="1" max="3" step="1" value="2"><div style="width:44px;text-align:center;font-weight:700" id="attentionValue">2</div></div>
+        </div>
+        <div class="control"><label for="readingPref">Reading preference</label><select id="readingPref" class="select"><option value="text">Text</option><option value="visual">Visual</option><option value="audio">Audio</option></select></div>
+        <div class="control"><label for="supportType">Support type</label><select id="supportType" class="select"><option value="default">Default</option><option value="dyslexic">Dyslexic</option><option value="adhd">ADHD</option><option value="autism">Autism</option></select></div>
+        <div class="control">
+          <label>Account</label>
+          <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+            <div><div style="font-weight:800">Shweta</div><div class="muted" style="font-size:13px">Student • AI-DS</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button id="editProfile" class="btn ghost">Edit</button>
+              <button id="signOut" class="btn" style="background:#fff;border:1px solid #ffdede;color:#ef4444;font-weight:800">Sign out</button>
+            </div>
           </div>
-        </div>
-        <div class="control">
-          <label for="readingPref">Reading preference</label>
-          <select id="readingPref" class="select">
-            <option value="text">Text</option>
-            <option value="visual">Visual</option>
-            <option value="audio">Audio</option>
-          </select>
-        </div>
-        <div class="control">
-          <label for="supportType">Support type</label>
-          <select id="supportType" class="select">
-            <option value="default">Default</option>
-            <option value="dyslexic">Dyslexic</option>
-            <option value="adhd">ADHD</option>
-            <option value="autism">Autism</option>
-          </select>
         </div>
       </aside>
     </div>
+
+    <!-- Export Report Button -->
+    <div style="text-align:center;margin-top:20px">
+      <button id="exportReport" class="btn primary">Export Report</button>
+    </div>
+
   </div>
 
-  <!-- FOOTER -->
-  <footer class="global-footer">
-    <div class="footer-inner">© <span id="year"></span> NeuroLearn — Focus-aware learning</div>
-  </footer>
-
+  <footer class="global-footer"><div class="footer-inner">© <span id="year"></span> NeuroLearn — Focus-aware learning</div></footer>
   <div id="toast" class="toast">Saved</div>
 
   <script>
+    const demo = { focusToday: 38, sessions: [22, 35, 38], savedSummaries: [{ title: 'Photosynthesis — Simple', snippet: 'Short summary about how plants convert light into energy', time: 'Today' }, { title: 'AI & Ethics', snippet: 'Key notes about fairness, bias and explainability', time: 'Yesterday' }] };
+
+    const focusTodayEl = document.getElementById('focusToday');
+    const sessionsCountEl = document.getElementById('sessionsCount');
+    const savedNotesCountEl = document.getElementById('savedNotesCount');
+    const summariesList = document.getElementById('summariesList');
+    const emptySummaries = document.getElementById('emptySummaries');
+    const avgFocusEl = document.getElementById('avgFocus');
+    const bestFocusEl = document.getElementById('bestFocus');
+
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    function renderOverview(data) {
+      focusTodayEl.innerHTML = data.focusToday + ' <span class="muted" style="font-weight:600;font-size:13px">min</span>';
+      sessionsCountEl.textContent = data.sessions.length;
+      savedNotesCountEl.textContent = data.savedSummaries.length;
+
+      const labels = data.sessions.map((_, i) => 'Session ' + (i + 1));
+      const ctx = document.getElementById('focusChart').getContext('2d');
+      if (window._focusChart) window._focusChart.destroy();
+      window._focusChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Minutes focused', data: data.sessions, fill: true, tension: 0.35, borderColor: getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#6366f1', backgroundColor: 'rgba(99,102,241,0.12)', pointRadius: 6, pointHoverRadius: 8 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+
+      const avg = Math.round(data.sessions.reduce((a, b) => a + b, 0) / Math.max(1, data.sessions.length));
+      avgFocusEl.textContent = avg;
+      bestFocusEl.textContent = Math.max(...data.sessions);
+
+      summariesList.innerHTML = '';
+      if (!data.savedSummaries.length) { emptySummaries.style.display = 'block'; } else { emptySummaries.style.display = 'none'; }
+      data.savedSummaries.forEach((s, idx) => {
+        const div = document.createElement('div');
+        div.className = 'summary-card';
+        div.innerHTML = `
+          <div class="summary-content">
+            <div class="summary-title">${escapeHtml(s.title)}</div>
+            <div class="summary-snippet">${escapeHtml(s.snippet)}</div>
+            <div class="muted" style="margin-top:8px;font-size:12px">${s.time}</div>
+          </div>
+          <div class="summary-actions">
+            <button class="btn ghost" data-idx="${idx}">Open</button>
+            <button class="btn" style="background:transparent;border:1px solid #fde68a;color:#92400e;border-radius:10px;font-weight:800" data-delete="${idx}">Delete</button>
+          </div>`;
+        summariesList.appendChild(div);
+      });
+    }
+
+    function escapeHtml(text) { return (text + '').replace(/[&<>\"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]); }
+
+    renderOverview(demo);
+
+    document.getElementById('attentionRange').addEventListener('input', (e) => {
+      const v = e.target.value;
+      document.getElementById('attentionValue').textContent = v;
+      const label = v == 1 ? 'Short' : v == 2 ? 'Medium' : 'Long';
+      document.getElementById('attentionLabel').textContent = label;
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', () => { showToast('Refreshed'); });
+    document.getElementById('newSummary').addEventListener('click', () => { showToast('Create summary flow (demo)'); });
+    summariesList.addEventListener('click', (e) => {
+      const open = e.target.closest('button[data-idx]');
+      const del = e.target.closest('button[data-delete]');
+      if (open) { const i = +open.dataset.idx; showToast('Opening summary: ' + demo.savedSummaries[i].title); }
+      if (del) { const i = +del.dataset.delete; demo.savedSummaries.splice(i, 1); renderOverview(demo); showToast('Deleted'); }
+    });
+
+    function showToast(text, timeout = 1800) { const t = document.getElementById('toast'); t.textContent = text; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), timeout); }
+    document.getElementById('signOut').addEventListener('click', () => { showToast('Signed out'); setTimeout(() => { window.location.href = 'index.html' }, 700); });
+
+    // --- Export: JSON + PDF ---
+    // JSON export (kept for compatibility)
+    document.getElementById('exportReport').addEventListener('click', async () => {
+      // Build report from current app state (uses `demo` which is the live in-memory data)
+      const report = {
+        generatedAt: new Date().toISOString(),
+        user: { name: 'Shweta', role: 'Student • AI-DS' },
+        focusToday: demo.focusToday,
+        sessions: demo.sessions,
+        savedSummaries: demo.savedSummaries,
+        attentionSpan: document.getElementById('attentionRange').value,
+        readingPreference: document.getElementById('readingPref').value,
+        supportType: document.getElementById('supportType').value
+      };
+
+      // Generate only PDF (no JSON download)
+      try {
+        await createPdfReport(report);
+        showToast('PDF exported');
+      } catch (err) {
+        console.error(err);
+        showToast('PDF export failed');
+      }
+    });
+
+    // Build a printable HTML report and convert to PDF using html2pdf
+    async function createPdfReport(report) {
+      // load html2pdf if not already loaded
+      if (typeof html2pdf === 'undefined') {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js');
+      }
+
+      // Create a report element
+      const reportEl = document.createElement('div');
+      reportEl.style.width = '800px';
+      reportEl.style.padding = '24px';
+      reportEl.style.fontFamily = 'Inter, Arial, sans-serif';
+      reportEl.style.color = '#0f172a';
+      reportEl.innerHTML = generateReportHtml(report);
+
+      // attach to DOM (hidden) so html2pdf can render styles/images
+      reportEl.style.position = 'fixed'; reportEl.style.left = '-9999px'; document.body.appendChild(reportEl);
+
+      const opt = {
+        margin: [12, 12, 12, 12],
+        filename: `NeuroLearn_Report_${new Date().toISOString().slice(0, 10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        await html2pdf().set(opt).from(reportEl).save();
+      } catch (err) {
+        console.error('PDF export failed', err); showToast('PDF export failed');
+      } finally {
+        document.body.removeChild(reportEl);
+      }
+    }
+
+    function generateReportHtml(report) {
+      // simple, clean layout — you can tweak styles here
+      const sessionsRows = report.sessions.map((s, i) => `<tr><td style="padding:6px 8px;border:1px solid #eee">${i+1}</td><td style="padding:6px 8px;border:1px solid #eee">${s} min</td></tr>`).join('');
+      const summariesRows = report.savedSummaries.map((s, i) => `<tr><td style="padding:6px 8px;border:1px solid #eee">${i+1}</td><td style="padding:6px 8px;border:1px solid #eee">${escapeHtml(s.title)}</td><td style="padding:6px 8px;border:1px solid #eee">${escapeHtml(s.snippet)}</td><td style="padding:6px 8px;border:1px solid #eee">${escapeHtml(s.time)}</td></tr>`).join('');
+
+      return `
+        <div style="width:100%;box-sizing:border-box;color:#0f172a">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+            <div>
+              <h1 style="margin:0;font-size:20px;color:#111827">NeuroLearn — Structured Report</h1>
+              <div style="color:#6b7280;margin-top:6px">Generated: ${new Date(report.generatedAt).toLocaleString()}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="background:linear-gradient(135deg,var(--brand),var(--brand-dark));padding:10px 14px;border-radius:8px;color:#fff;font-weight:800">NL</div>
+            </div>
+          </div>
+
+          <section style="margin-bottom:12px">
+            <h2 style="margin:0 0 6px 0;font-size:16px">Overview</h2>
+            <table style="width:100%;border-collapse:collapse;margin-top:6px">
+              <tr><td style="padding:6px 8px;border:1px solid #eee;width:40%">User</td><td style="padding:6px 8px;border:1px solid #eee">${escapeHtml(report.user.name)} — ${escapeHtml(report.user.role)}</td></tr>
+              <tr><td style="padding:6px 8px;border:1px solid #eee">Focus today</td><td style="padding:6px 8px;border:1px solid #eee">${report.focusToday} minutes</td></tr>
+              <tr><td style="padding:6px 8px;border:1px solid #eee">Sessions (count)</td><td style="padding:6px 8px;border:1px solid #eee">${report.sessions.length}</td></tr>
+            </table>
+          </section>
+
+          <section style="margin-top:12px;margin-bottom:12px">
+            <h2 style="margin:0 0 6px 0;font-size:16px">Sessions (recent)</h2>
+            <table style="width:100%;border-collapse:collapse;border:1px solid #eee">
+              <thead><tr style="background:#fafafa"><th style="padding:8px;border:1px solid #eee">#</th><th style="padding:8px;border:1px solid #eee">Minutes focused</th></tr></thead>
+              <tbody>${sessionsRows}</tbody>
+            </table>
+          </section>
+
+          <section style="margin-top:12px">
+            <h2 style="margin:0 0 6px 0;font-size:16px">Saved Summaries</h2>
+            <table style="width:100%;border-collapse:collapse;border:1px solid #eee">
+              <thead><tr style="background:#fafafa"><th style="padding:8px;border:1px solid #eee">#</th><th style="padding:8px;border:1px solid #eee">Title</th><th style="padding:8px;border:1px solid #eee">Snippet</th><th style="padding:8px;border:1px solid #eee">Saved</th></tr></thead>
+              <tbody>${summariesRows}</tbody>
+            </table>
+          </section>
+
+          <footer style="margin-top:18px;border-top:1px solid #eee;padding-top:12px;color:#6b7280;font-size:12px">NeuroLearn — Focus-aware learning</footer>
+        </div>
+      `;
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script'); s.src = src; s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
+      });
+    }
   </script>
 </body>
 </html>
