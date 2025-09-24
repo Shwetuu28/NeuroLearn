@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NeuroLearn — FaceMesh Focus (Debug)</title>
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#071025; color:#e6eef8; margin:0; padding:16px; }
+    .wrap { max-width:900px; margin:0 auto; display:flex; gap:16px; align-items:flex-start; }
+    .left { width:420px; }
+    .right { flex:1; min-width:260px; }
+    video, canvas { width:420px; max-width:100%; border-radius:10px; background:#000; display:block; }
+    .status-card { margin-top:10px; background: rgba(255,255,255,0.03); padding:10px; border-radius:8px; color:#dbeafe; }
+    .big { font-size:18px; font-weight:700; }
+    .tele { display:flex; gap:8px; margin-top:6px; }
+    .tele div { background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:6px; font-size:13px; }
+    .controls { background:#0b1524; padding:12px; border-radius:8px; color:#cbd5e1; }
+    label { display:block; font-size:13px; margin-top:8px; color:#9fb0d6; }
+    input[type=range] { width:100%; }
+    .btn { margin-top:10px; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; background:#2563eb; color:#fff; }
+    .distract { color:#fda4af; font-weight:700; }
+    .focused { color:#86efac; font-weight:700; }
+    .small { font-size:12px; color:#94a3b8; }
+    .footer { margin-top:12px; font-size:12px; color:#94a3b8; }
+    .row { display:flex; gap:8px; align-items:center; }
+  </style>
+</head>
+<body>
+  <h2 style="margin:0 0 12px 0">NeuroLearn — Focus (FaceMesh) • Debug Tuning</h2>
+
+  <div class="wrap">
+    <div class="left">
+      <div style="position:relative">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="overlay" style="position:absolute;left:0;top:0;"></canvas>
+      </div>
+
+      <div class="status-card">
+        <div class="big">Status: <span id="statusText">Initializing...</span></div>
+        <div class="tele">
+          <div>Open: <span id="openness">-</span></div>
+          <div>Yaw: <span id="yaw">-</span></div>
+          <div>Smoothed Open: <span id="sopen">-</span></div>
+          <div>Smoothed Yaw: <span id="syaw">-</span></div>
+        </div>
+        <div style="margin-top:8px" class="row">
+          <div class="small">Consecutive bad frames:</div><div id="badcount" class="small" style="font-weight:700">0</div>
+        </div>
+        <div style="margin-top:6px" class="row">
+          <div class="small">Focused seconds:</div><div id="fseconds" class="small" style="font-weight:700">0</div>
+        </div>
+      </div>
+
+      <div style="margin-top:8px">
+        <button id="resetBtn" class="btn">Reset Counters</button>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="controls">
+        <div><strong>Tuning controls</strong></div>
+
+        <label>Eye openness threshold: <span id="th_eye_text">0.18</span></label>
+        <input id="th_eye" type="range" min="0.05" max="0.4" step="0.01" value="0.18">
+
+        <label>Yaw threshold (abs): <span id="th_yaw_text">0.35</span></label>
+        <input id="th_yaw" type="range" min="0.08" max="0.6" step="0.01" value="0.35">
+
+        <label>Consecutive required: <span id="th_cons_text">6</span></label>
+        <input id="th_cons" type="range" min="1" max="12" step="1" value="6">
+
+        <label>Smoothing frames (moving avg): <span id="th_smooth_text">6</span></label>
+        <input id="th_smooth" type="range" min="1" max="20" step="1" value="6">
+
+        <label>Timeout for no-face → distracted (seconds): <span id="no_face_text">3</span></label>
+        <input id="no_face" type="range" min="1" max="8" step="1" value="3">
+
+        <label>Send minimal events to backend:</label>
+        <div class="row">
+          <button id="toggleSend" class="btn">Send OFF</button>
+          <div class="small" style="margin-left:8px">Backend URL: <span id="backendUrl">http://localhost:4000/api/focus/log</span></div>
+        </div>
+
+        <div class="footer">
+          <strong>Tips:</strong> Start with thresholds low (eye ~0.12–0.20). Increase if too noisy. Use smoothing 4–8 frames. If stuck on distracted, raise eye threshold or reduce consecutive required.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- mediapipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+  <script>
+  (async function(){
+    // Elements
+    const video = document.getElementById('video');
+    const overlay = document.getElementById('overlay');
+    const ctx = overlay.getContext('2d');
+    const statusText = document.getElementById('statusText');
+    const opennessEl = document.getElementById('openness');
+    const yawEl = document.getElementById('yaw');
+    const sopenEl = document.getElementById('sopen');
+    const syawEl = document.getElementById('syaw');
+    const badcountEl = document.getElementById('badcount');
+    const fsecondsEl = document.getElementById('fseconds');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Controls
+    const th_eye = document.getElementById('th_eye');
+    const th_yaw = document.getElementById('th_yaw');
+    const th_cons = document.getElementById('th_cons');
+    const th_smooth = document.getElementById('th_smooth');
+    const no_face = document.getElementById('no_face');
+    const toggleSend = document.getElementById('toggleSend');
+    const backendUrlEl = document.getElementById('backendUrl');
+
+    const th_eye_text = document.getElementById('th_eye_text');
+    const th_yaw_text = document.getElementById('th_yaw_text');
+    const th_cons_text = document.getElementById('th_cons_text');
+    const th_smooth_text = document.getElementById('th_smooth_text');
+    const no_face_text = document.getElementById('no_face_text');
+
+    // defaults
+    let CONFIG = {
+      sendFocusEventsToBackend: false,
+      backendUrl: backendUrlEl.textContent,
+      userId: 'demo'
+    };
+
+    // update labels
+    function refreshLabels(){
+      th_eye_text.textContent = th_eye.value;
+      th_yaw_text.textContent = th_yaw.value;
+      th_cons_text.textContent = th_cons.value;
+      th_smooth_text.textContent = th_smooth.value;
+      no_face_text.textContent = no_face.value;
+    }
+    refreshLabels();
+
+    th_eye.addEventListener('input', refreshLabels);
+    th_yaw.addEventListener('input', refreshLabels);
+    th_cons.addEventListener('input', refreshLabels);
+    th_smooth.addEventListener('input', refreshLabels);
+    no_face.addEventListener('input', refreshLabels);
+
+    toggleSend.addEventListener('click', () => {
+      CONFIG.sendFocusEventsToBackend = !CONFIG.sendFocusEventsToBackend;
+      toggleSend.textContent = CONFIG.sendFocusEventsToBackend ? 'Send ON' : 'Send OFF';
+    });
+
+    resetBtn.addEventListener('click', () => {
+      consecutiveBad = 0;
+      focusedStart = Date.now();
+      isFocused = true;
+      statusText.textContent = 'Reset — Focused';
+    });
+
+    // State
+    let consecutiveBad = 0;
+    let isFocused = true;
+    let focusedStart = Date.now();
+    let lastFaceSeenAt = Date.now();
+
+    // smoothing buffers
+    const openBuf = [];
+    const yawBuf = [];
+
+    // helper distance
+    const dist = (a,b) => Math.hypot(a.x-b.x, a.y-b.y);
+
+    // compute openness and yaw (using mediapipe landmarks)
+    function computeMetrics(landmarks){
+      // safety
+      if(!landmarks || landmarks.length < 400) return {open:0, yaw:0};
+
+      // left eye landmarks
+      const leftTop = landmarks[159];
+      const leftBottom = landmarks[145];
+      const leftLeft = landmarks[33];
+      const leftRight = landmarks[133];
+      const leftVert = dist(leftTop, leftBottom);
+      const leftHoriz = dist(leftLeft, leftRight) + 1e-6;
+
+      // right eye landmarks
+      const rightTop = landmarks[386];
+      const rightBottom = landmarks[374];
+      const rightLeft = landmarks[362];
+      const rightRight = landmarks[263];
+      const rightVert = dist(rightTop, rightBottom);
+      const rightHoriz = dist(rightLeft, rightRight) + 1e-6;
+
+      const leftScore = leftVert / leftHoriz;
+      const rightScore = rightVert / rightHoriz;
+      const open = (leftScore + rightScore) / 2;
+
+      // yaw: relative x of nose to eye center normalized by eye distance
+      const nose = landmarks[1];
+      const leftEyeMidX = (landmarks[33].x + landmarks[133].x)/2;
+      const rightEyeMidX = (landmarks[362].x + landmarks[263].x)/2;
+      const eyeCenterX = (leftEyeMidX + rightEyeMidX)/2;
+      const eyeDist = Math.abs(leftEyeMidX - rightEyeMidX) + 1e-6;
+      const yaw = (nose.x - eyeCenterX) / eyeDist;
+
+      return {open, yaw};
+    }
+
+    // send event
+    async function sendEvent(focused, durationSecs=0){
+      if(!CONFIG.sendFocusEventsToBackend) return;
+      try{
+        await fetch(CONFIG.backendUrl, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ userId: CONFIG.userId, focused, duration: Math.round(durationSecs) })
+        });
+      }catch(e){ console.warn('sendEvent failed', e.message); }
+    }
+
+    // draw landmarks for debugging
+    function drawLandmarks(landmarks, width, height){
+      ctx.clearRect(0,0,overlay.width, overlay.height);
+      if(!landmarks) return;
+      // draw small points
+      ctx.fillStyle = 'rgba(0,255,200,0.9)';
+      for(let i=0;i<landmarks.length;i++){
+        const x = landmarks[i].x * width;
+        const y = landmarks[i].y * height;
+        ctx.beginPath();
+        ctx.arc(x,y,1.6,0,Math.PI*2);
+        ctx.fill();
+      }
+      // draw eyes approx boxes for visual
+      function drawLine(i,j){
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(landmarks[i].x*width, landmarks[i].y*height); ctx.lineTo(landmarks[j].x*width, landmarks[j].y*height); ctx.stroke();
+      }
+      drawLine(33,133); drawLine(362,263); // eye horizontals
+      // nose marker
+      ctx.fillStyle = 'rgba(255,100,100,0.9)'; ctx.beginPath(); ctx.arc(landmarks[1].x*width, landmarks[1].y*height, 2.4, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Mediapipe setup
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.55,
+      minTrackingConfidence: 0.55
+    });
+
+    faceMesh.onResults(results => {
+      if(!results) return;
+      const width = video.videoWidth || 420;
+      const height = video.videoHeight || 315;
+      overlay.width = width; overlay.height = height;
+
+      if(!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0){
+        // no face
+        const since = (Date.now() - lastFaceSeenAt)/1000;
+        // if longer than configured no-face timeout, increment bad count
+        if(since > parseInt(no_face.value,10)){
+          consecutiveBad++;
+        } else {
+          // don't increment too early
+          consecutiveBad = Math.max(0, consecutiveBad - 1);
+        }
+        // clear drawing
+        ctx.clearRect(0,0,overlay.width, overlay.height);
+      } else {
+        lastFaceSeenAt = Date.now();
+        const landmarks = results.multiFaceLandmarks[0];
+        drawLandmarks(landmarks, width, height);
+
+        const metrics = computeMetrics(landmarks);
+        // smoothing buffers
+        openBuf.push(metrics.open);
+        yawBuf.push(metrics.yaw);
+        if(openBuf.length > parseInt(th_smooth.value,10)) openBuf.shift();
+        if(yawBuf.length > parseInt(th_smooth.value,10)) yawBuf.shift();
+
+        const sopen = openBuf.reduce((a,b)=>a+b,0)/openBuf.length;
+        const syaw = yawBuf.reduce((a,b)=>a+b,0)/yawBuf.length;
+
+        opennessEl.textContent = metrics.open.toFixed(3);
+        yawEl.textContent = metrics.yaw.toFixed(3);
+        sopenEl.textContent = sopen.toFixed(3);
+        syawEl.textContent = syaw.toFixed(3);
+
+        // decide if frame is "good"
+        const eyeOk = sopen > parseFloat(th_eye.value);
+        const yawOk = Math.abs(syaw) < parseFloat(th_yaw.value);
+
+        if(eyeOk && yawOk){
+          consecutiveBad = Math.max(0, consecutiveBad - 1);
+        } else {
+          consecutiveBad++;
+        }
+      }
+
+      // decide overall state
+      badcountEl.textContent = consecutiveBad;
+      const cons = parseInt(th_cons.value,10);
+
+      if(consecutiveBad >= cons){
+        if(isFocused){
+          // become distracted
+          isFocused = false;
+          statusText.innerHTML = '<span class="distract">😴 Distracted</span>';
+          sendEvent(false, 0);
+        }
+      } else {
+        if(!isFocused){
+          isFocused = true;
+          focusedStart = Date.now();
+          statusText.innerHTML = '<span class="focused">⚡ Focused</span>';
+          sendEvent(true, 0);
+        }
+      }
+
+      // focused seconds update
+      if(isFocused){
+        fsecondsEl.textContent = Math.floor((Date.now() - focusedStart)/1000);
+      } else {
+        fsecondsEl.textContent = '0';
+      }
+    });
+
+    // camera
+    const camera = new Camera(video, {
+      onFrame: async () => { await faceMesh.send({image: video}); },
+      width: 640,
+      height: 480
+    });
+
+    async function startCamera(){
+      try {
+        await camera.start();
+        statusText.textContent = 'Detecting...';
+        focusedStart = Date.now();
+      } catch (e) {
+        console.error('camera start failed', e);
+        statusText.textContent = 'Camera error';
+      }
+    }
+    startCamera();
+
+    // expose some for debugging in console
+    window.NL_DEBUG = {
+      setThresholds: (eye,yaw,cons,smooth) => {
+        th_eye.value = eye; th_yaw.value = yaw; th_cons.value = cons; th_smooth.value = smooth; refreshLabels();
+      }
+    };
+
+    // show labels update after setup
+    function refreshLabels(){
+      document.getElementById('th_eye_text').textContent = th_eye.value;
+      document.getElementById('th_yaw_text').textContent = th_yaw.value;
+      document.getElementById('th_cons_text').textContent = th_cons.value;
+      document.getElementById('th_smooth_text').textContent = th_smooth.value;
+      document.getElementById('no_face_text').textContent = no_face.value;
+    }
+    refreshLabels();
+    th_eye.addEventListener('input', refreshLabels);
+    th_yaw.addEventListener('input', refreshLabels);
+    th_cons.addEventListener('input', refreshLabels);
+    th_smooth.addEventListener('input', refreshLabels);
+    no_face.addEventListener('input', refreshLabels);
+
+    // small helpers / vars
+    let consecutiveBad = 0;
+    let isFocused = true;
+
+  })();
+  </script>
+</body>
+</html>
